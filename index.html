@@ -596,9 +596,9 @@ function renderSettings(){
   ).join('');
 }
 
-let modalMode='pos',modalEditIdx=-1;
+let modalMode='pos',modalEditIdx=-1,modalOriginalMode='pos';
 function openModal(type){
-  modalMode=type;modalEditIdx=-1;
+  modalMode=type;modalEditIdx=-1;modalOriginalMode=type;
   document.getElementById('modalTitle').textContent='Gewoonte toevoegen';
   document.getElementById('modalName').value='';
   document.getElementById('modalXP').value='';
@@ -607,7 +607,7 @@ function openModal(type){
   document.getElementById('modalOverlay').classList.add('open');
 }
 function openEditModal(type,idx){
-  modalMode=type;modalEditIdx=idx;
+  modalMode=type;modalEditIdx=idx;modalOriginalMode=type;
   const h=type==='pos'?state.pos[idx]:state.stop[idx];
   document.getElementById('modalTitle').textContent='Gewoonte bewerken';
   document.getElementById('modalName').value=h.name;
@@ -630,8 +630,25 @@ function saveHabit(){
   const pts=modalMode==='stop'?-Math.abs(xpRaw):Math.abs(xpRaw);
   if(!name){showToast('Vul een naam in');return;}
   if(modalEditIdx>=0){
-    if(modalMode==='pos')state.pos[modalEditIdx]={...state.pos[modalEditIdx],name,pts};
-    else state.stop[modalEditIdx]={...state.stop[modalEditIdx],name,pts};
+    const fromList=modalOriginalMode==='pos'?state.pos:state.stop;
+    const toList=modalMode==='pos'?state.pos:state.stop;
+    const existing=fromList[modalEditIdx];
+    if(!existing){showToast('Gewoonte niet gevonden');return;}
+    const updated={...existing,name,pts};
+    if(modalOriginalMode===modalMode){
+      fromList[modalEditIdx]=updated;
+    } else {
+      fromList.splice(modalEditIdx,1);
+      toList.push(updated);
+      Object.values(state.days).forEach(day=>{
+        day.pos=day.pos||{};day.stop=day.stop||{};
+        if(modalOriginalMode==='pos'&&day.pos[existing.id]){
+          delete day.pos[existing.id];day.stop[existing.id]=true;
+        } else if(modalOriginalMode==='stop'&&day.stop[existing.id]){
+          delete day.stop[existing.id];day.pos[existing.id]=true;
+        }
+      });
+    }
   } else {
     const id='h_'+Date.now();
     if(modalMode==='pos')state.pos.push({id,name,pts});
