@@ -475,7 +475,7 @@ function renderAll(){
 
   document.getElementById('posGrid').innerHTML=state.pos.map(h=>{
     const done=!!ds.pos[h.id];
-    return '<div class="hcard'+(done?' done':'')+'" onclick="togglePos(\\''+h.id+'\\')">'+
+    return '<div class="hcard'+(done?' done':'')+'" onclick="togglePos(\''+h.id+'\')">'+
       '<div class="hcard-left"><div class="chk">'+(done?chkSVG('#fff'):'')+
       '</div><div class="hcard-info"><div class="hcard-name">'+h.name+'</div>'+
       '<div class="hcard-sub">'+(done?'Voltooid vandaag':'Tik als klaar')+'</div></div></div>'+
@@ -484,7 +484,7 @@ function renderAll(){
 
   document.getElementById('stopGrid').innerHTML=state.stop.map(h=>{
     const failed=!!ds.stop[h.id];
-    return '<div class="hcard'+(failed?' penalty-done':' penalty')+'" onclick="toggleStop(\\''+h.id+'\\')">'+
+    return '<div class="hcard'+(failed?' penalty-done':' penalty')+'" onclick="toggleStop(\''+h.id+'\')">'+
       '<div class="hcard-left"><div class="chk">'+(failed?xSVG('#fff'):'')+
       '</div><div class="hcard-info"><div class="hcard-name">'+h.name+'</div>'+
       '<div class="hcard-sub">'+(failed?'Gefaald vandaag':'Tik als je faalt')+'</div></div></div>'+
@@ -522,7 +522,7 @@ function renderMonth(){
     else if(xp>0)cls+=' has-xp';
     if(isToday)cls+=' today';
     if(isSelected)cls+=' selected';
-    grid+='<div class="'+cls+'" onclick="'+(isFuture?'':('goToDay(\\''+dt+'\\')'))+'">'
+    grid+='<div class="'+cls+'" onclick="'+(isFuture?'':('goToDay(\''+dt+'\')'))+'">'
       +'<div class="cd-num">'+day+'</div>'
       +'<div class="cd-xp'+(xp>0?' pos':'')+'">'+xp+'</div></div>';
   }
@@ -581,13 +581,13 @@ function renderSettings(){
     '<div class="habit-edit-card">'+
     '<span class="he-type he-pos">+'+h.pts+'XP</span>'+
     '<span class="he-name">'+h.name+'</span>'+
-    '<button class="reset-tiny" onclick="openEditModal(\\'pos\\','+i+')">bewerk</button></div>'
+    '<button class="reset-tiny" onclick="openEditModal(\'pos\','+i+')">bewerk</button></div>'
   ).join('');
   document.getElementById('stopEditList').innerHTML=state.stop.map((h,i)=>
     '<div class="habit-edit-card">'+
     '<span class="he-type he-stop">'+h.pts+'XP</span>'+
     '<span class="he-name">'+h.name+'</span>'+
-    '<button class="reset-tiny" onclick="openEditModal(\\'stop\\','+i+')">bewerk</button></div>'
+    '<button class="reset-tiny" onclick="openEditModal(\'stop\','+i+')">bewerk</button></div>'
   ).join('');
   document.getElementById('rewardEditList').innerHTML=state.rewards.map((r,i)=>
     '<div class="habit-edit-card">'+
