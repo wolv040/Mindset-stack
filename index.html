@@ -342,7 +342,7 @@ const DAYS_NL=['Ma','Di','Wo','Do','Vr','Za','Zo'];
 
 let state;
 try{state=JSON.parse(localStorage.getItem('mindset_stack_v3')||'null');}catch(e){}
-if(!state){
+if(!state||typeof state!=='object'){
   const today=new Date();
   state={
     currentDate:today.toISOString().slice(0,10),
@@ -352,12 +352,33 @@ if(!state){
     days:{},
   };
 }
+normalizeLoadedState();
 
 function save(){try{localStorage.setItem('mindset_stack_v3',JSON.stringify(state));}catch(e){}}
 
+function cloneDefaults(list){return JSON.parse(JSON.stringify(list));}
+function normalizeHabitList(list,defaults){
+  if(!Array.isArray(list))return cloneDefaults(defaults);
+  return list.filter(h=>h&&typeof h==='object'&&h.name&&Number.isFinite(Number(h.pts))).map((h,i)=>{
+    const slug=String(h.name).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')||'habit';
+    return {id:h.id||('h_recovered_'+i+'_'+slug),name:String(h.name),pts:Number(h.pts)};
+  });
+}
+function normalizeLoadedState(){
+  state.pos=normalizeHabitList(state.pos,DEFAULT_POS);
+  state.stop=normalizeHabitList(state.stop,DEFAULT_STOP);
+  if(!Array.isArray(state.rewards))state.rewards=cloneDefaults(DEFAULT_REWARDS);
+  if(!state.days||typeof state.days!=='object')state.days={};
+}
+
 function parseDate(s){const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
 function formatDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function getDayState(dateStr){if(!state.days[dateStr])state.days[dateStr]={pos:{},stop:{}};return state.days[dateStr];}
+function getDayState(dateStr){
+  if(!state.days[dateStr])state.days[dateStr]={pos:{},stop:{}};
+  if(!state.days[dateStr].pos)state.days[dateStr].pos={};
+  if(!state.days[dateStr].stop)state.days[dateStr].stop={};
+  return state.days[dateStr];
+}
 
 function getDayXP(dateStr){
   const ds=getDayState(dateStr);
@@ -596,9 +617,9 @@ function renderSettings(){
   ).join('');
 }
 
-let modalMode='pos',modalEditIdx=-1;
+let modalMode='pos',modalEditIdx=-1,modalOriginalMode=null;
 function openModal(type){
-  modalMode=type;modalEditIdx=-1;
+  modalMode=type;modalEditIdx=-1;modalOriginalMode=null;
   document.getElementById('modalTitle').textContent='Gewoonte toevoegen';
   document.getElementById('modalName').value='';
   document.getElementById('modalXP').value='';
@@ -607,7 +628,7 @@ function openModal(type){
   document.getElementById('modalOverlay').classList.add('open');
 }
 function openEditModal(type,idx){
-  modalMode=type;modalEditIdx=idx;
+  modalMode=type;modalEditIdx=idx;modalOriginalMode=type;
   const h=type==='pos'?state.pos[idx]:state.stop[idx];
   document.getElementById('modalTitle').textContent='Gewoonte bewerken';
   document.getElementById('modalName').value=h.name;
@@ -630,8 +651,27 @@ function saveHabit(){
   const pts=modalMode==='stop'?-Math.abs(xpRaw):Math.abs(xpRaw);
   if(!name){showToast('Vul een naam in');return;}
   if(modalEditIdx>=0){
-    if(modalMode==='pos')state.pos[modalEditIdx]={...state.pos[modalEditIdx],name,pts};
-    else state.stop[modalEditIdx]={...state.stop[modalEditIdx],name,pts};
+    const source=modalOriginalMode==='pos'?state.pos:state.stop;
+    const existing=source[modalEditIdx];
+    if(!existing){showToast('Gewoonte niet gevonden');return;}
+    const updated={...existing,name,pts};
+    if(modalOriginalMode===modalMode){
+      source[modalEditIdx]=updated;
+    } else {
+      source.splice(modalEditIdx,1);
+      if(modalMode==='pos')state.pos.push(updated);
+      else state.stop.push(updated);
+      Object.values(state.days).forEach(ds=>{
+        if(!ds.pos)ds.pos={};
+        if(!ds.stop)ds.stop={};
+        const from=modalOriginalMode==='pos'?ds.pos:ds.stop;
+        const to=modalMode==='pos'?ds.pos:ds.stop;
+        if(from[existing.id]){
+          to[existing.id]=from[existing.id];
+          delete from[existing.id];
+        }
+      });
+    }
   } else {
     const id='h_'+Date.now();
     if(modalMode==='pos')state.pos.push({id,name,pts});
@@ -641,7 +681,7 @@ function saveHabit(){
 }
 function deleteHabit(){
   if(!confirm('Gewoonte verwijderen?'))return;
-  if(modalMode==='pos')state.pos.splice(modalEditIdx,1);
+  if(modalOriginalMode==='pos')state.pos.splice(modalEditIdx,1);
   else state.stop.splice(modalEditIdx,1);
   save();closeModal();renderAll();showToast('Verwijderd');
 }
