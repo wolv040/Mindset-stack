@@ -596,9 +596,9 @@ function renderSettings(){
   ).join('');
 }
 
-let modalMode='pos',modalEditIdx=-1;
+let modalMode='pos',modalEditIdx=-1,modalEditType=null;
 function openModal(type){
-  modalMode=type;modalEditIdx=-1;
+  modalMode=type;modalEditIdx=-1;modalEditType=null;
   document.getElementById('modalTitle').textContent='Gewoonte toevoegen';
   document.getElementById('modalName').value='';
   document.getElementById('modalXP').value='';
@@ -607,7 +607,7 @@ function openModal(type){
   document.getElementById('modalOverlay').classList.add('open');
 }
 function openEditModal(type,idx){
-  modalMode=type;modalEditIdx=idx;
+  modalMode=type;modalEditIdx=idx;modalEditType=type;
   const h=type==='pos'?state.pos[idx]:state.stop[idx];
   document.getElementById('modalTitle').textContent='Gewoonte bewerken';
   document.getElementById('modalName').value=h.name;
@@ -630,8 +630,16 @@ function saveHabit(){
   const pts=modalMode==='stop'?-Math.abs(xpRaw):Math.abs(xpRaw);
   if(!name){showToast('Vul een naam in');return;}
   if(modalEditIdx>=0){
-    if(modalMode==='pos')state.pos[modalEditIdx]={...state.pos[modalEditIdx],name,pts};
-    else state.stop[modalEditIdx]={...state.stop[modalEditIdx],name,pts};
+    const originalList=modalEditType==='pos'?state.pos:state.stop;
+    const existing=originalList[modalEditIdx];
+    const updated={...existing,name,pts};
+    if(modalMode===modalEditType){
+      originalList[modalEditIdx]=updated;
+    } else {
+      originalList.splice(modalEditIdx,1);
+      if(modalMode==='pos')state.pos.push(updated);
+      else state.stop.push(updated);
+    }
   } else {
     const id='h_'+Date.now();
     if(modalMode==='pos')state.pos.push({id,name,pts});
@@ -641,7 +649,7 @@ function saveHabit(){
 }
 function deleteHabit(){
   if(!confirm('Gewoonte verwijderen?'))return;
-  if(modalMode==='pos')state.pos.splice(modalEditIdx,1);
+  if(modalEditType==='pos')state.pos.splice(modalEditIdx,1);
   else state.stop.splice(modalEditIdx,1);
   save();closeModal();renderAll();showToast('Verwijderd');
 }
