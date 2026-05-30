@@ -596,9 +596,10 @@ function renderSettings(){
   ).join('');
 }
 
-let modalMode='pos',modalEditIdx=-1;
+let modalMode='pos',modalEditIdx=-1,modalOriginalMode='pos',modalOriginalIdx=-1;
+function habitList(type){return type==='pos'?state.pos:state.stop;}
 function openModal(type){
-  modalMode=type;modalEditIdx=-1;
+  modalMode=type;modalEditIdx=-1;modalOriginalMode=type;modalOriginalIdx=-1;
   document.getElementById('modalTitle').textContent='Gewoonte toevoegen';
   document.getElementById('modalName').value='';
   document.getElementById('modalXP').value='';
@@ -607,8 +608,8 @@ function openModal(type){
   document.getElementById('modalOverlay').classList.add('open');
 }
 function openEditModal(type,idx){
-  modalMode=type;modalEditIdx=idx;
-  const h=type==='pos'?state.pos[idx]:state.stop[idx];
+  modalMode=type;modalEditIdx=idx;modalOriginalMode=type;modalOriginalIdx=idx;
+  const h=habitList(type)[idx];
   document.getElementById('modalTitle').textContent='Gewoonte bewerken';
   document.getElementById('modalName').value=h.name;
   document.getElementById('modalXP').value=Math.abs(h.pts);
@@ -623,6 +624,15 @@ function setType(t){
 }
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
 function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+function moveHabitChecks(id,fromType,toType){
+  Object.values(state.days).forEach(ds=>{
+    if(ds[fromType]&&ds[fromType][id]){
+      if(!ds[toType])ds[toType]={};
+      ds[toType][id]=ds[fromType][id];
+      delete ds[fromType][id];
+    }
+  });
+}
 
 function saveHabit(){
   const name=document.getElementById('modalName').value.trim();
@@ -630,19 +640,26 @@ function saveHabit(){
   const pts=modalMode==='stop'?-Math.abs(xpRaw):Math.abs(xpRaw);
   if(!name){showToast('Vul een naam in');return;}
   if(modalEditIdx>=0){
-    if(modalMode==='pos')state.pos[modalEditIdx]={...state.pos[modalEditIdx],name,pts};
-    else state.stop[modalEditIdx]={...state.stop[modalEditIdx],name,pts};
+    const originalList=habitList(modalOriginalMode);
+    const original=originalList[modalOriginalIdx];
+    if(!original){showToast('Gewoonte niet gevonden');return;}
+    const updated={...original,name,pts};
+    if(modalMode===modalOriginalMode){
+      originalList[modalOriginalIdx]=updated;
+    }else{
+      originalList.splice(modalOriginalIdx,1);
+      habitList(modalMode).push(updated);
+      moveHabitChecks(updated.id,modalOriginalMode,modalMode);
+    }
   } else {
     const id='h_'+Date.now();
-    if(modalMode==='pos')state.pos.push({id,name,pts});
-    else state.stop.push({id,name,pts});
+    habitList(modalMode).push({id,name,pts});
   }
   save();closeModal();renderAll();showToast('Opgeslagen!');
 }
 function deleteHabit(){
   if(!confirm('Gewoonte verwijderen?'))return;
-  if(modalMode==='pos')state.pos.splice(modalEditIdx,1);
-  else state.stop.splice(modalEditIdx,1);
+  habitList(modalOriginalMode).splice(modalOriginalIdx,1);
   save();closeModal();renderAll();showToast('Verwijderd');
 }
 function clearAll(){
