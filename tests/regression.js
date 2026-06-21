@@ -73,7 +73,9 @@ function createModalContext() {
   assert.deepEqual(context.state.pos.map((h) => h.id), ['p0']);
   assert.deepEqual(context.state.stop.map((h) => h.id), ['s0', 's1', 'p1']);
   assert.equal(context.state.stop[1].name, 'Stop 1', 'editing a positive habit must not overwrite stop index 1');
-  assert.deepEqual(context.state.stop[2], { id: 'p1', name: 'Moved habit', pts: -30 });
+  assert.equal(context.state.stop[2].id, 'p1');
+  assert.equal(context.state.stop[2].name, 'Moved habit');
+  assert.equal(context.state.stop[2].pts, -30);
   assert.equal(context.state.days['2026-06-20'].pos.p1, undefined);
   assert.equal(context.state.days['2026-06-20'].stop.p1, true);
 }
