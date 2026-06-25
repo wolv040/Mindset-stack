@@ -107,14 +107,18 @@ const app = runApp({
   },
 });
 
+function habitIds(habits) {
+  return Array.from(habits, (habit) => habit.id);
+}
+
 app.context.openEditModal('pos', 0);
 app.context.setType('stop');
 app.elements.get('modalName').value = 'Read penalty';
 app.elements.get('modalXP').value = '7';
 app.context.saveHabit();
 
-assert.deepEqual(app.state.pos.map((habit) => habit.id), ['p2'], 'moved habit should leave the positive list');
-assert.deepEqual(app.state.stop.map((habit) => habit.id), ['s1', 's2', 'p1'], 'moved habit should append to the penalty list without overwriting entries');
+assert.deepEqual(habitIds(app.state.pos), ['p2'], 'moved habit should leave the positive list');
+assert.deepEqual(habitIds(app.state.stop), ['s1', 's2', 'p1'], 'moved habit should append to the penalty list without overwriting entries');
 assert.equal(app.state.stop[2].name, 'Read penalty');
 assert.equal(app.state.stop[2].pts, -7);
 assert.equal(app.state.days['2026-06-25'].pos.p1, undefined, 'moved habit day marker should leave source type');
@@ -126,7 +130,7 @@ app.context.openEditModal('stop', 1);
 app.context.setType('pos');
 app.context.deleteHabit();
 
-assert.deepEqual(app.state.pos.map((habit) => habit.id), ['p2'], 'delete should not use the selected destination type');
-assert.deepEqual(app.state.stop.map((habit) => habit.id), ['s1', 'p1'], 'delete should remove the originally edited habit');
+assert.deepEqual(habitIds(app.state.pos), ['p2'], 'delete should not use the selected destination type');
+assert.deepEqual(habitIds(app.state.stop), ['s1', 'p1'], 'delete should remove the originally edited habit');
 
 console.log('regression tests passed');
