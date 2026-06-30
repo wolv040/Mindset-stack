@@ -13,6 +13,8 @@ assert(!html.includes('"returncode"'), 'index.html must not contain command wrap
 const scriptMatch = html.match(/<script>([\s\S]*)<\/script>/);
 assert(scriptMatch, 'inline application script should be present');
 
+const habitIds = (habits) => Array.from(habits, (h) => h.id);
+
 function createElement() {
   return {
     textContent: '',
@@ -89,7 +91,7 @@ this.__app = {
 
 {
   const { app, elements } = createAppContext();
-  const originalStop = app.state.stop.map((h) => h.id);
+  const originalStop = habitIds(app.state.stop);
   app.getDayState(app.state.currentDate).pos.semen = true;
 
   app.openEditModal('pos', 0);
@@ -101,7 +103,7 @@ this.__app = {
   assert.strictEqual(app.state.pos.some((h) => h.id === 'semen'), false);
   assert.strictEqual(app.state.stop.some((h) => h.id === 'semen'), true);
   assert.deepStrictEqual(
-    app.state.stop.slice(0, originalStop.length).map((h) => h.id),
+    habitIds(app.state.stop.slice(0, originalStop.length)),
     originalStop,
     'changing a positive habit to penalty must not overwrite an existing penalty habit'
   );
@@ -111,7 +113,7 @@ this.__app = {
 
 {
   const { app } = createAppContext();
-  const originalPos = app.state.pos.map((h) => h.id);
+  const originalPos = habitIds(app.state.pos);
 
   app.openEditModal('pos', 0);
   app.setType('stop');
@@ -119,12 +121,12 @@ this.__app = {
 
   assert.strictEqual(app.state.pos.some((h) => h.id === 'semen'), false);
   assert.deepStrictEqual(
-    app.state.stop.map((h) => h.id),
-    app.DEFAULT_STOP.map((h) => h.id),
+    habitIds(app.state.stop),
+    habitIds(app.DEFAULT_STOP),
     'delete after changing type selection must delete the original habit only'
   );
   assert.deepStrictEqual(
-    app.state.pos.map((h) => h.id),
+    habitIds(app.state.pos),
     originalPos.slice(1),
     'delete should remove the edited positive habit'
   );
