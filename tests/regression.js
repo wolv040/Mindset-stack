@@ -103,6 +103,9 @@ function createHarness(seedState) {
   return context.__appTest;
 }
 
+const ids = list => Array.from(list, item => item.id);
+const plain = value => JSON.parse(JSON.stringify(value));
+
 {
   const app = createHarness(baseState());
 
@@ -113,10 +116,10 @@ function createHarness(seedState) {
   app.saveHabit();
 
   const state = app.getState();
-  assert.deepStrictEqual(state.pos.map(h => h.id), ['p2']);
-  assert.deepStrictEqual(state.stop.map(h => h.id), ['s1', 'p1']);
+  assert.deepStrictEqual(ids(state.pos), ['p2']);
+  assert.deepStrictEqual(ids(state.stop), ['s1', 'p1']);
   assert.strictEqual(state.stop[0].name, 'Existing penalty');
-  assert.deepStrictEqual(state.stop[1], { id: 'p1', name: 'Moved to penalty', pts: -7 });
+  assert.deepStrictEqual(plain(state.stop[1]), { id: 'p1', name: 'Moved to penalty', pts: -7 });
   assert.strictEqual(state.days['2026-07-02'].pos.p1, undefined);
   assert.strictEqual(state.days['2026-07-02'].stop.p1, true);
   assert.strictEqual(state.days['2026-07-02'].stop.s1, true);
@@ -130,8 +133,8 @@ function createHarness(seedState) {
   app.deleteHabit();
 
   const state = app.getState();
-  assert.deepStrictEqual(state.pos.map(h => h.id), ['p2']);
-  assert.deepStrictEqual(state.stop.map(h => h.id), ['s1']);
+  assert.deepStrictEqual(ids(state.pos), ['p2']);
+  assert.deepStrictEqual(ids(state.stop), ['s1']);
   assert.strictEqual(state.days['2026-07-02'].pos.p1, undefined);
   assert.strictEqual(state.days['2026-07-02'].stop.s1, true);
 }
