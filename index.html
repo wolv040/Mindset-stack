@@ -1,4 +1,695 @@
-{
-  "returncode" : 0,
-  "stdout" : "<!DOCTYPE html>\n<html lang=\"nl\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0\">\n<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black-translucent\">\n<meta name=\"theme-color\" content=\"#0a0a0f\">\n<title>Mindset Stack<\/title>\n<link href=\"https:\/\/fonts.googleapis.com\/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700;800&display=swap\" rel=\"stylesheet\">\n<style>\n:root {\n  --bg: #0a0a0f;\n  --surface: #13131a;\n  --surface2: #1c1c26;\n  --border: rgba(255,255,255,0.07);\n  --border2: rgba(255,255,255,0.12);\n  --text: #f0f0f0;\n  --text2: #888;\n  --text3: #555;\n  --green: #1D9E75;\n  --green-l: rgba(29,158,117,0.15);\n  --green-d: #0f6e56;\n  --red: #D85A30;\n  --red-l: rgba(216,90,48,0.15);\n  --amber: #EF9F27;\n  --amber-l: rgba(239,159,39,0.12);\n  --radius: 14px;\n  --radius-sm: 8px;\n}\n* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }\nhtml, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overscroll-behavior: none; }\nbody { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100dvh; }\n\n\/* Header *\/\n.app-header { padding: 56px 20px 16px; background: var(--bg); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); }\n.header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }\n.app-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }\n.app-title span { color: var(--green); }\n.day-nav { display: flex; align-items: center; gap: 8px; }\n.nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); font-size: 14px; transition: all 0.15s; }\n.nav-btn:active { transform: scale(0.92); background: var(--green-l); }\n.day-label { font-size: 13px; font-weight: 500; color: var(--text2); min-width: 90px; text-align: center; font-family: 'DM Mono', monospace; }\n\n\/* Level bar *\/\n.level-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; }\n.level-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }\n.level-name { font-size: 20px; font-weight: 700; }\n.level-xp { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; }\n.bar-track { height: 6px; background: var(--surface2); border-radius: 6px; overflow: hidden; }\n.bar-fill { height: 100%; background: var(--green); border-radius: 6px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }\n\n\/* Stats *\/\n.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }\n.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 10px; text-align: center; }\n.stat-n { font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace; }\n.stat-l { font-size: 10px; color: var(--text2); margin-top: 3px; letter-spacing: 0.04em; }\n\n\/* Tabs *\/\n.tabs { display: flex; background: var(--surface); border-radius: var(--radius-sm); padding: 3px; margin-bottom: 16px; }\n.tab { flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; color: var(--text2); transition: all 0.15s; }\n.tab.active { background: var(--green); color: #fff; }\n\n\/* Main scroll *\/\n.main-scroll { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }\n.panel { display: none; }\n.panel.active { display: block; }\n\n\/* Section label *\/\n.sec-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 10px; }\n\n\/* Habit cards *\/\n.habits-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }\n.hcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; user-select: none; }\n.hcard:active { transform: scale(0.98); }\n.hcard.done { background: var(--green-l); border-color: var(--green); }\n.hcard.penalty { border-color: rgba(216,90,48,0.3); }\n.hcard.penalty-done { background: var(--red-l); border-color: var(--red); }\n.hcard-left { display: flex; align-items: center; gap: 12px; flex: 1; }\n.chk { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }\n.hcard.done .chk { background: var(--green); border-color: var(--green); }\n.hcard.penalty-done .chk { background: var(--red); border-color: var(--red); }\n.hcard-info { flex: 1; }\n.hcard-name { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.2; }\n.hcard-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }\n.hcard.done .hcard-sub { color: var(--green); }\n.hcard.penalty-done .hcard-sub { color: var(--red); }\n.badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; font-family: 'DM Mono', monospace; white-space: nowrap; }\n.badge-green { background: var(--green-l); color: var(--green); }\n.badge-green-done { background: var(--green); color: #fff; }\n.badge-red { background: var(--red-l); color: var(--red); }\n.badge-red-done { background: var(--red); color: #fff; }\n\n\/* Month calendar *\/\n.cal-header { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 6px; }\n.cal-day-lbl { font-size: 10px; color: var(--text3); text-align: center; font-weight: 500; }\n.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 16px; }\n.cal-day { border-radius: 8px; padding: 6px 2px; text-align: center; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; }\n.cal-day:active { transform: scale(0.94); }\n.cal-day.today { border-color: var(--green); }\n.cal-day.selected { background: var(--green-l); border-color: var(--green); }\n.cal-day.has-xp { background: var(--surface2); }\n.cal-day.future { opacity: 0.3; cursor: default; }\n.cal-day.empty { cursor: default; }\n.cd-num { font-size: 13px; font-weight: 600; color: var(--text); }\n.cd-xp { font-size: 9px; color: var(--text3); margin-top: 1px; font-family: 'DM Mono', monospace; }\n.cd-xp.pos { color: var(--green); }\n\n.month-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 20px; }\n.ms-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }\n.ms-n { font-size: 22px; font-weight: 700; font-family: 'DM Mono', monospace; }\n.ms-n.green { color: var(--green); }\n.ms-n.amber { color: var(--amber); }\n.ms-l { font-size: 10px; color: var(--text2); margin-top: 2px; }\n\n.habit-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }\n.habit-row:last-child { border: none; }\n.hr-name { font-size: 12px; color: var(--text2); width: 130px; flex-shrink: 0; }\n.hr-bar-wrap { flex: 1; height: 5px; background: var(--surface2); border-radius: 5px; overflow: hidden; }\n.hr-bar { height: 100%; border-radius: 5px; transition: width 0.4s; }\n.hr-count { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); min-width: 36px; text-align: right; }\n\n\/* Rewards *\/\n.reward-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; }\n.reward-card.unlocked { border-color: var(--green); background: var(--green-l); }\n.rc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }\n.rc-level { font-size: 14px; font-weight: 700; }\n.rc-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }\n.rc-unlocked { background: var(--green); color: #fff; }\n.rc-locked { background: var(--surface2); color: var(--text2); }\n.rc-reward { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }\n.rc-perk { font-size: 11px; color: var(--text2); }\n.reward-card.unlocked .rc-perk { color: var(--green-d); }\n\n\/* Settings *\/\n.settings-section { margin-bottom: 24px; }\n.settings-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; }\n.habit-edit-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }\n.he-name { flex: 1; font-size: 13px; color: var(--text); }\n.he-pts { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text2); min-width: 50px; text-align: right; }\n.he-type { font-size: 10px; padding: 2px 7px; border-radius: 10px; }\n.he-pos { background: var(--green-l); color: var(--green); }\n.he-stop { background: var(--red-l); color: var(--red); }\n.add-btn { width: 100%; background: var(--surface2); border: 1px dashed var(--border2); border-radius: var(--radius-sm); padding: 12px; text-align: center; cursor: pointer; font-size: 13px; color: var(--text2); font-family: 'Syne', sans-serif; }\n.add-btn:active { background: var(--green-l); color: var(--green); }\n\n\/* Modal *\/\n.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }\n.modal-overlay.open { opacity: 1; pointer-events: all; }\n.modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1); }\n.modal-overlay.open .modal { transform: translateY(0); }\n.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }\n.field-lbl { font-size: 11px; color: var(--text2); margin-bottom: 5px; letter-spacing: 0.04em; }\n.field-inp { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; margin-bottom: 12px; outline: none; }\n.field-inp:focus { border-color: var(--green); }\n.field-row { display: flex; gap: 8px; margin-bottom: 12px; }\n.type-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 500; transition: all 0.12s; }\n.type-btn.active-pos { background: var(--green-l); border-color: var(--green); color: var(--green); }\n.type-btn.active-stop { background: var(--red-l); border-color: var(--red); color: var(--red); }\n.modal-btns { display: flex; gap: 8px; margin-top: 4px; }\n.modal-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.12s; }\n.modal-btn:active { transform: scale(0.97); }\n.btn-cancel { background: var(--surface2); color: var(--text2); }\n.btn-save { background: var(--green); color: #fff; }\n.btn-delete { background: var(--red-l); color: var(--red); }\n\n\/* Toast *\/\n.toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--surface2); border: 1px solid var(--border2); border-radius: 30px; padding: 8px 16px; font-size: 13px; font-weight: 500; color: var(--text); z-index: 200; opacity: 0; transition: all 0.25s; white-space: nowrap; }\n.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }\n\n\/* Reset btn *\/\n.reset-tiny { background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 10px; color: var(--text3); cursor: pointer; font-family: 'Syne', sans-serif; }\n.reset-tiny:active { color: var(--red); border-color: var(--red); }\n\n\/* Levels strip *\/\n.levels-strip { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; }\n.lp { font-size: 10px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--text3); background: var(--surface); }\n.lp.active { background: var(--green); color: #fff; border-color: var(--green); font-weight: 700; }\n.lp.done { border-color: var(--green-d); color: var(--green-d); }\n\n\/* Nav bottom *\/\n.bottom-nav { display: flex; background: var(--surface); border-top: 1px solid var(--border); padding: 8px 0 24px; position: sticky; bottom: 0; }\n.bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; cursor: pointer; color: var(--text3); transition: color 0.12s; font-size: 10px; font-weight: 500; }\n.bn-item.active { color: var(--green); }\n.bn-icon { font-size: 20px; }\n<\/style>\n<\/head>\n<body>\n\n<div class=\"app-header\">\n  <div class=\"header-top\">\n    <div>\n      <div class=\"app-title\">Mindset <span>Stack<\/span><\/div>\n      <div style=\"font-size:11px;color:var(--text2);margin-top:2px;font-family:'DM Mono',monospace;\" id=\"dateDisplay\">-<\/div>\n    <\/div>\n    <div class=\"day-nav\">\n      <button class=\"nav-btn\" onclick=\"changeDay(-1)\">&#8592;<\/button>\n      <span class=\"day-label\" id=\"dayLabel\">-<\/span>\n      <button class=\"nav-btn\" onclick=\"changeDay(1)\">&#8594;<\/button>\n      <button class=\"reset-tiny\" onclick=\"resetDay()\">reset<\/button>\n    <\/div>\n  <\/div>\n  <div class=\"level-wrap\">\n    <div class=\"level-row\">\n      <span class=\"level-name\" id=\"levelName\">-<\/span>\n      <span class=\"level-xp\" id=\"levelXp\">-<\/span>\n    <\/div>\n    <div class=\"bar-track\"><div class=\"bar-fill\" id=\"barFill\" style=\"width:0%\"><\/div><\/div>\n    <div class=\"levels-strip\" id=\"levelsStrip\"><\/div>\n  <\/div>\n  <div class=\"stats-row\">\n    <div class=\"stat-card\"><div class=\"stat-n\" id=\"sCumXP\">0<\/div><div class=\"stat-l\">totaal XP<\/div><\/div>\n    <div class=\"stat-card\"><div class=\"stat-n\" id=\"sDayXP\">0<\/div><div class=\"stat-l\">vandaag<\/div><\/div>\n    <div class=\"stat-card\"><div class=\"stat-n\" id=\"sStreak\">0<\/div><div class=\"stat-l\">streak<\/div><\/div>\n  <\/div>\n<\/div>\n\n<div class=\"main-scroll\">\n\n  <!-- DAG PANEL -->\n  <div class=\"panel active\" id=\"panel-dag\">\n    <div class=\"sec-lbl\">POSITIEVE GEWOONTES<\/div>\n    <div class=\"habits-grid\" id=\"posGrid\"><\/div>\n    <div class=\"sec-lbl\">PENALTY — tik als je hebt gefaald<\/div>\n    <div class=\"habits-grid\" id=\"stopGrid\"><\/div>\n  <\/div>\n\n  <!-- MAAND PANEL -->\n  <div class=\"panel\" id=\"panel-maand\">\n    <div class=\"sec-lbl\" id=\"monthTitle\">APRIL 2026<\/div>\n    <div class=\"cal-header\">\n      <div class=\"cal-day-lbl\">ma<\/div><div class=\"cal-day-lbl\">di<\/div><div class=\"cal-day-lbl\">wo<\/div>\n      <div class=\"cal-day-lbl\">do<\/div><div class=\"cal-day-lbl\">vr<\/div><div class=\"cal-day-lbl\">za<\/div>\n      <div class=\"cal-day-lbl\">zo<\/div>\n    <\/div>\n    <div class=\"cal-grid\" id=\"calGrid\"><\/div>\n    <div class=\"month-stats\">\n      <div class=\"ms-card\"><div class=\"ms-n green\" id=\"msXP\">0<\/div><div class=\"ms-l\">totaal XP deze maand<\/div><\/div>\n      <div class=\"ms-card\"><div class=\"ms-n amber\" id=\"msStreak\">0<\/div><div class=\"ms-l\">langste streak<\/div><\/div>\n      <div class=\"ms-card\"><div class=\"ms-n\" id=\"msActive\">0<\/div><div class=\"ms-l\">actieve dagen<\/div><\/div>\n      <div class=\"ms-card\"><div class=\"ms-n\" id=\"msAvg\">0<\/div><div class=\"ms-l\">gem. XP per dag<\/div><\/div>\n    <\/div>\n    <div class=\"sec-lbl\">SCORE PER GEWOONTE<\/div>\n    <div id=\"habitMonthList\"><\/div>\n  <\/div>\n\n  <!-- BELONINGEN PANEL -->\n  <div class=\"panel\" id=\"panel-beloningen\">\n    <div id=\"rewardsList\"><\/div>\n  <\/div>\n\n  <!-- INSTELLINGEN PANEL -->\n  <div class=\"panel\" id=\"panel-instellingen\">\n    <div class=\"settings-section\">\n      <div class=\"settings-title\">Positieve gewoontes<\/div>\n      <div id=\"posEditList\"><\/div>\n      <div class=\"add-btn\" onclick=\"openModal('pos')\">+ Gewoonte toevoegen<\/div>\n    <\/div>\n    <div class=\"settings-section\">\n      <div class=\"settings-title\">Penalty gewoontes<\/div>\n      <div id=\"stopEditList\"><\/div>\n      <div class=\"add-btn\" onclick=\"openModal('stop')\">+ Penalty toevoegen<\/div>\n    <\/div>\n    <div class=\"settings-section\">\n      <div class=\"settings-title\">Beloningen aanpassen<\/div>\n      <div id=\"rewardEditList\"><\/div>\n    <\/div>\n    <div style=\"margin-top:8px;\">\n      <div class=\"add-btn\" onclick=\"if(confirm('Alle data verwijderen?'))clearAll()\" style=\"color:#D85A30;\">Alle data verwijderen<\/div>\n    <\/div>\n  <\/div>\n\n<\/div>\n\n<!-- Bottom nav -->\n<div class=\"bottom-nav\">\n  <div class=\"bn-item active\" id=\"nav-dag\" onclick=\"switchMain('dag')\">\n    <div class=\"bn-icon\">&#9737;<\/div><div>Dag<\/div>\n  <\/div>\n  <div class=\"bn-item\" id=\"nav-maand\" onclick=\"switchMain('maand')\">\n    <div class=\"bn-icon\">&#128197;<\/div><div>Maand<\/div>\n  <\/div>\n  <div class=\"bn-item\" id=\"nav-beloningen\" onclick=\"switchMain('beloningen')\">\n    <div class=\"bn-icon\">&#9733;<\/div><div>Beloningen<\/div>\n  <\/div>\n  <div class=\"bn-item\" id=\"nav-instellingen\" onclick=\"switchMain('instellingen')\">\n    <div class=\"bn-icon\">&#9881;<\/div><div>Instellingen<\/div>\n  <\/div>\n<\/div>\n\n<!-- Modal -->\n<div class=\"modal-overlay\" id=\"modalOverlay\" onclick=\"closeModalOutside(event)\">\n  <div class=\"modal\">\n    <div class=\"modal-title\" id=\"modalTitle\">Gewoonte toevoegen<\/div>\n    <div class=\"field-lbl\">NAAM<\/div>\n    <input class=\"field-inp\" id=\"modalName\" placeholder=\"bijv. Cold shower\" \/>\n    <div class=\"field-lbl\">TYPE<\/div>\n    <div class=\"field-row\">\n      <button class=\"type-btn active-pos\" id=\"typePosBtn\" onclick=\"setType('pos')\">Positief<\/button>\n      <button class=\"type-btn\" id=\"typeStopBtn\" onclick=\"setType('stop')\">Penalty<\/button>\n    <\/div>\n    <div class=\"field-lbl\">XP WAARDE<\/div>\n    <input class=\"field-inp\" id=\"modalXP\" type=\"number\" placeholder=\"bijv. 10\" \/>\n    <div class=\"modal-btns\">\n      <button class=\"modal-btn btn-cancel\" onclick=\"closeModal()\">Annuleer<\/button>\n      <button class=\"modal-btn btn-delete\" id=\"deleteBtn\" style=\"display:none\" onclick=\"deleteHabit()\">Verwijder<\/button>\n      <button class=\"modal-btn btn-save\" onclick=\"saveHabit()\">Opslaan<\/button>\n    <\/div>\n  <\/div>\n<\/div>\n\n<!-- Toast -->\n<div class=\"toast\" id=\"toast\"><\/div>\n\n<script>\nconst DEFAULT_POS=[\n  {id:'semen',name:'Semen retentie',pts:15},\n  {id:'dialoog',name:'Instant dialoog',pts:8},\n  {id:'muay',name:'Muay Thai',pts:20},\n  {id:'fysiek',name:'Fysieke activiteit',pts:12},\n  {id:'lezen',name:'Lezen \/ cursus',pts:10},\n  {id:'mediteer',name:'Mediteren',pts:10},\n  {id:'adem',name:'Ademhaling',pts:8},\n  {id:'money',name:'Money moves',pts:15},\n  {id:'ongemak',name:'Ongemakkelijke actie',pts:12},\n];\nconst DEFAULT_STOP=[\n  {id:'frisdrank',name:'Geen frisdrank',pts:-20},\n  {id:'social',name:'Max 1u social media',pts:-25},\n  {id:'dating',name:'Geen dating app',pts:-25},\n];\nconst DEFAULT_REWARDS=[\n  {level:'Beginner',xp:0,reward:'Tracker toegang',perk:'Start je systeem op'},\n  {level:'Consistent',xp:100,reward:'1 vrije ochtend',perk:'Kies zelf je training die dag'},\n  {level:'Gefocust',xp:250,reward:'Nieuwe sportuitrusting (50 euro)',perk:'Budget voor gear + 1 cheatmeal'},\n  {level:'Disciplined',xp:500,reward:'Solo dagtrip + 100 euro investering',perk:'Volledig vrije dag naar keuze'},\n  {level:'Elite',xp:900,reward:'Weekendtrip + 250 euro investering',perk:'Trip + eigen regel toevoegen'},\n  {level:'Sovereign',xp:1500,reward:'Reis naar keuze',perk:'Volledige vrijheid — jij bepaalt'},\n];\nconst MONTHS_NL=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];\nconst DAYS_NL=['Ma','Di','Wo','Do','Vr','Za','Zo'];\n\nlet state;\ntry{state=JSON.parse(localStorage.getItem('mindset_stack_v3')||'null');}catch(e){}\nif(!state){\n  const today=new Date();\n  state={\n    currentDate:today.toISOString().slice(0,10),\n    pos:JSON.parse(JSON.stringify(DEFAULT_POS)),\n    stop:JSON.parse(JSON.stringify(DEFAULT_STOP)),\n    rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),\n    days:{},\n  };\n}\n\nfunction save(){try{localStorage.setItem('mindset_stack_v3',JSON.stringify(state));}catch(e){}}\n\nfunction parseDate(s){const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}\nfunction formatDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}\nfunction getDayState(dateStr){if(!state.days[dateStr])state.days[dateStr]={pos:{},stop:{}};return state.days[dateStr];}\n\nfunction getDayXP(dateStr){\n  const ds=getDayState(dateStr);\n  let xp=0;\n  state.pos.forEach(h=>{if(ds.pos[h.id])xp+=h.pts;});\n  state.stop.forEach(h=>{if(ds.stop[h.id])xp+=h.pts;});\n  return Math.max(0,xp);\n}\n\nfunction getCumXP(upToDate){\n  let total=0;\n  Object.keys(state.days).forEach(dt=>{\n    if(dt<=upToDate)total+=getDayXP(dt);\n  });\n  return total;\n}\n\nfunction getTotalXP(){\n  return getCumXP(formatDate(new Date()));\n}\n\nfunction getStreak(upToDate){\n  const d=parseDate(upToDate);\n  let streak=0;\n  for(let i=0;i<60;i++){\n    const check=new Date(d);check.setDate(d.getDate()-i);\n    if(getDayXP(formatDate(check))>0)streak++;\n    else break;\n  }\n  return streak;\n}\n\nfunction getMaxStreak(year,month){\n  const days=new Date(year,month+1,0).getDate();\n  let max=0,cur=0;\n  for(let d=1;d<=days;d++){\n    const dt=formatDate(new Date(year,month,d));\n    if(getDayXP(dt)>0){cur++;if(cur>max)max=cur;}else cur=0;\n  }\n  return max;\n}\n\nfunction getLevelIdx(xp){\n  const levels=DEFAULT_REWARDS;\n  for(let i=levels.length-1;i>=0;i--){if(xp>=levels[i].xp)return i;}\n  return 0;\n}\n\nfunction showToast(msg){\n  const t=document.getElementById('toast');\n  t.textContent=msg;t.classList.add('show');\n  clearTimeout(t._timer);\n  t._timer=setTimeout(()=>t.classList.remove('show'),1800);\n}\n\nfunction changeDay(delta){\n  const d=parseDate(state.currentDate);\n  d.setDate(d.getDate()+delta);\n  state.currentDate=formatDate(d);\n  save();renderAll();\n}\n\nfunction resetDay(){\n  if(!confirm('Reset gewoontes voor deze dag?'))return;\n  state.days[state.currentDate]={pos:{},stop:{}};\n  save();renderAll();showToast('Dag gereset');\n}\n\nfunction togglePos(id){\n  const ds=getDayState(state.currentDate);\n  const h=state.pos.find(x=>x.id===id);\n  if(ds.pos[id]){delete ds.pos[id];showToast('-'+h.pts+' XP');}\n  else{ds.pos[id]=true;showToast('+'+h.pts+' XP verdiend!');}\n  save();renderAll();\n}\n\nfunction toggleStop(id){\n  const ds=getDayState(state.currentDate);\n  const h=state.stop.find(x=>x.id===id);\n  if(ds.stop[id]){delete ds.stop[id];showToast('Penalty verwijderd');}\n  else{ds.stop[id]=true;showToast(h.pts+' XP penalty!');}\n  save();renderAll();\n}\n\nfunction renderAll(){\n  const cd=state.currentDate;\n  const d=parseDate(cd);\n  const ds=getDayState(cd);\n  const dayXP=getDayXP(cd);\n  const totalXP=getTotalXP();\n  const streak=getStreak(cd);\n  const today=formatDate(new Date());\n  const isToday=cd===today;\n\n  document.getElementById('dayLabel').textContent=(isToday?'vandaag ':'')+d.getDate()+' '+MONTHS_NL[d.getMonth()].slice(0,3).toLowerCase();\n  document.getElementById('dateDisplay').textContent=DAYS_NL[d.getDay()===0?6:d.getDay()-1]+' '+d.getDate()+' '+MONTHS_NL[d.getMonth()]+' '+d.getFullYear();\n\n  const lvlIdx=getLevelIdx(totalXP);\n  const lvl=DEFAULT_REWARDS[lvlIdx];\n  const nextLvl=DEFAULT_REWARDS[Math.min(lvlIdx+1,DEFAULT_REWARDS.length-1)];\n  const pct=lvlIdx<DEFAULT_REWARDS.length-1?Math.min(100,Math.round((totalXP-lvl.xp)\/(nextLvl.xp-lvl.xp)*100)):100;\n  document.getElementById('levelName').textContent=lvl.level;\n  document.getElementById('levelXp').textContent=totalXP+' \/ '+nextLvl.xp+' XP';\n  document.getElementById('barFill').style.width=pct+'%';\n  document.getElementById('sCumXP').textContent=totalXP;\n  document.getElementById('sDayXP').textContent=dayXP;\n  document.getElementById('sStreak').textContent=streak;\n\n  document.getElementById('levelsStrip').innerHTML=DEFAULT_REWARDS.map((r,i)=>{\n    let cls='lp';\n    if(i===lvlIdx)cls+=' active';\n    else if(i<lvlIdx)cls+=' done';\n    return '<span class=\"'+cls+'\">'+r.level+'<\/span>';\n  }).join('');\n\n  document.getElementById('posGrid').innerHTML=state.pos.map(h=>{\n    const done=!!ds.pos[h.id];\n    return '<div class=\"hcard'+(done?' done':'')+'\" onclick=\"togglePos(\\''+h.id+'\\')\">'+\n      '<div class=\"hcard-left\"><div class=\"chk\">'+(done?chkSVG('#fff'):'')+\n      '<\/div><div class=\"hcard-info\"><div class=\"hcard-name\">'+h.name+'<\/div>'+\n      '<div class=\"hcard-sub\">'+(done?'Voltooid vandaag':'Tik als klaar')+'<\/div><\/div><\/div>'+\n      '<span class=\"badge '+(done?'badge-green-done':'badge-green')+'\">'+(done?'klaar':'+'+h.pts+' XP')+'<\/span><\/div>';\n  }).join('');\n\n  document.getElementById('stopGrid').innerHTML=state.stop.map(h=>{\n    const failed=!!ds.stop[h.id];\n    return '<div class=\"hcard'+(failed?' penalty-done':' penalty')+'\" onclick=\"toggleStop(\\''+h.id+'\\')\">'+\n      '<div class=\"hcard-left\"><div class=\"chk\">'+(failed?xSVG('#fff'):'')+\n      '<\/div><div class=\"hcard-info\"><div class=\"hcard-name\">'+h.name+'<\/div>'+\n      '<div class=\"hcard-sub\">'+(failed?'Gefaald vandaag':'Tik als je faalt')+'<\/div><\/div><\/div>'+\n      '<span class=\"badge '+(failed?'badge-red-done':'badge-red')+'\">'+(failed?'gefaald':h.pts+' XP')+'<\/span><\/div>';\n  }).join('');\n\n  if(document.getElementById('panel-maand').classList.contains('active'))renderMonth();\n  if(document.getElementById('panel-beloningen').classList.contains('active'))renderRewards();\n  if(document.getElementById('panel-instellingen').classList.contains('active'))renderSettings();\n}\n\nfunction chkSVG(c){return '<svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><polyline points=\"2,6 5,9 10,3\" stroke=\"'+c+'\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"\/><\/svg>';}\nfunction xSVG(c){return '<svg width=\"12\" height=\"12\" viewBox=\"0 0 12 12\"><line x1=\"2\" y1=\"2\" x2=\"10\" y2=\"10\" stroke=\"'+c+'\" stroke-width=\"2\" stroke-linecap=\"round\"\/><line x1=\"10\" y1=\"2\" x2=\"2\" y2=\"10\" stroke=\"'+c+'\" stroke-width=\"2\" stroke-linecap=\"round\"\/><\/svg>';}\n\nfunction renderMonth(){\n  const d=parseDate(state.currentDate);\n  const year=d.getFullYear(),month=d.getMonth();\n  const daysInMonth=new Date(year,month+1,0).getDate();\n  const today=formatDate(new Date());\n  const firstDow=new Date(year,month,1).getDay();\n  const startOffset=firstDow===0?6:firstDow-1;\n\n  document.getElementById('monthTitle').textContent=MONTHS_NL[month].toUpperCase()+' '+year;\n\n  let grid='';\n  for(let e=0;e<startOffset;e++)grid+='<div class=\"cal-day empty\"><\/div>';\n  for(let day=1;day<=daysInMonth;day++){\n    const dt=formatDate(new Date(year,month,day));\n    const xp=getDayXP(dt);\n    const isFuture=dt>today;\n    const isToday=dt===today;\n    const isSelected=dt===state.currentDate;\n    let cls='cal-day';\n    if(isFuture)cls+=' future';\n    else if(xp>0)cls+=' has-xp';\n    if(isToday)cls+=' today';\n    if(isSelected)cls+=' selected';\n    grid+='<div class=\"'+cls+'\" onclick=\"'+(isFuture?'':('goToDay(\\''+dt+'\\')'))+'\">'\n      +'<div class=\"cd-num\">'+day+'<\/div>'\n      +'<div class=\"cd-xp'+(xp>0?' pos':'')+'\">'+xp+'<\/div><\/div>';\n  }\n  document.getElementById('calGrid').innerHTML=grid;\n\n  let totalXP=0,activeDays=0;\n  for(let day=1;day<=daysInMonth;day++){\n    const dt=formatDate(new Date(year,month,day));\n    if(dt<=today){const x=getDayXP(dt);totalXP+=x;if(x>0)activeDays++;}\n  }\n  const maxStreak=getMaxStreak(year,month);\n  const avg=activeDays>0?Math.round(totalXP\/activeDays):0;\n  document.getElementById('msXP').textContent=totalXP;\n  document.getElementById('msStreak').textContent=maxStreak;\n  document.getElementById('msActive').textContent=activeDays;\n  document.getElementById('msAvg').textContent=avg;\n\n  const allH=[...state.pos.map(h=>({...h,isStop:false})),...state.stop.map(h=>({...h,isStop:true}))];\n  const daysTracked=parseInt(today.split('-')[2]);\n  document.getElementById('habitMonthList').innerHTML=allH.map(h=>{\n    let count=0;\n    for(let day=1;day<=Math.min(daysTracked,daysInMonth);day++){\n      const dt=formatDate(new Date(year,month,day));\n      const ds=getDayState(dt);\n      if(h.isStop?ds.stop[h.id]:ds.pos[h.id])count++;\n    }\n    const pct=Math.min(100,Math.round(count\/Math.min(daysTracked,daysInMonth)*100));\n    return '<div class=\"habit-row\">'+\n      '<span class=\"hr-name\">'+h.name+'<\/span>'+\n      '<div class=\"hr-bar-wrap\"><div class=\"hr-bar\" style=\"width:'+pct+'%;background:'+(h.isStop?'#D85A30':'#1D9E75')+'\"><\/div><\/div>'+\n      '<span class=\"hr-count\">'+count+'x<\/span><\/div>';\n  }).join('');\n}\n\nfunction goToDay(dt){\n  state.currentDate=dt;save();\n  switchMain('dag');renderAll();\n}\n\nfunction renderRewards(){\n  const d=parseDate(state.currentDate);\n  const cumXP=getCumXP(state.currentDate);\n  const lvlIdx=getLevelIdx(cumXP);\n  document.getElementById('rewardsList').innerHTML=state.rewards.map((r,i)=>{\n    const unlocked=cumXP>=r.xp;\n    return '<div class=\"reward-card'+(unlocked?' unlocked':'')+'\">'+\n      '<div class=\"rc-top\"><span class=\"rc-level\">'+r.level+' ('+r.xp+'+ XP)<\/span>'+\n      '<span class=\"rc-badge '+(unlocked?'rc-unlocked':'rc-locked')+'\">'+(unlocked?'Ontgrendeld':'Vergrendeld')+'<\/span><\/div>'+\n      '<div class=\"rc-reward\">'+r.reward+'<\/div>'+\n      '<div class=\"rc-perk\">'+r.perk+'<\/div><\/div>';\n  }).join('');\n}\n\nfunction renderSettings(){\n  document.getElementById('posEditList').innerHTML=state.pos.map((h,i)=>\n    '<div class=\"habit-edit-card\">'+\n    '<span class=\"he-type he-pos\">+'+h.pts+'XP<\/span>'+\n    '<span class=\"he-name\">'+h.name+'<\/span>'+\n    '<button class=\"reset-tiny\" onclick=\"openEditModal(\\'pos\\','+i+')\">bewerk<\/button><\/div>'\n  ).join('');\n  document.getElementById('stopEditList').innerHTML=state.stop.map((h,i)=>\n    '<div class=\"habit-edit-card\">'+\n    '<span class=\"he-type he-stop\">'+h.pts+'XP<\/span>'+\n    '<span class=\"he-name\">'+h.name+'<\/span>'+\n    '<button class=\"reset-tiny\" onclick=\"openEditModal(\\'stop\\','+i+')\">bewerk<\/button><\/div>'\n  ).join('');\n  document.getElementById('rewardEditList').innerHTML=state.rewards.map((r,i)=>\n    '<div class=\"habit-edit-card\">'+\n    '<span class=\"he-type he-pos\">'+r.xp+'XP<\/span>'+\n    '<span class=\"he-name\">'+r.level+' — '+r.reward+'<\/span><\/div>'\n  ).join('');\n}\n\nlet modalMode='pos',modalEditIdx=-1;\nfunction openModal(type){\n  modalMode=type;modalEditIdx=-1;\n  document.getElementById('modalTitle').textContent='Gewoonte toevoegen';\n  document.getElementById('modalName').value='';\n  document.getElementById('modalXP').value='';\n  document.getElementById('deleteBtn').style.display='none';\n  setType(type);\n  document.getElementById('modalOverlay').classList.add('open');\n}\nfunction openEditModal(type,idx){\n  modalMode=type;modalEditIdx=idx;\n  const h=type==='pos'?state.pos[idx]:state.stop[idx];\n  document.getElementById('modalTitle').textContent='Gewoonte bewerken';\n  document.getElementById('modalName').value=h.name;\n  document.getElementById('modalXP').value=Math.abs(h.pts);\n  document.getElementById('deleteBtn').style.display='block';\n  setType(type);\n  document.getElementById('modalOverlay').classList.add('open');\n}\nfunction setType(t){\n  modalMode=t;\n  document.getElementById('typePosBtn').className='type-btn'+(t==='pos'?' active-pos':'');\n  document.getElementById('typeStopBtn').className='type-btn'+(t==='stop'?' active-stop':'');\n}\nfunction closeModal(){document.getElementById('modalOverlay').classList.remove('open');}\nfunction closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}\n\nfunction saveHabit(){\n  const name=document.getElementById('modalName').value.trim();\n  const xpRaw=parseInt(document.getElementById('modalXP').value)||10;\n  const pts=modalMode==='stop'?-Math.abs(xpRaw):Math.abs(xpRaw);\n  if(!name){showToast('Vul een naam in');return;}\n  if(modalEditIdx>=0){\n    if(modalMode==='pos')state.pos[modalEditIdx]={...state.pos[modalEditIdx],name,pts};\n    else state.stop[modalEditIdx]={...state.stop[modalEditIdx],name,pts};\n  } else {\n    const id='h_'+Date.now();\n    if(modalMode==='pos')state.pos.push({id,name,pts});\n    else state.stop.push({id,name,pts});\n  }\n  save();closeModal();renderAll();showToast('Opgeslagen!');\n}\nfunction deleteHabit(){\n  if(!confirm('Gewoonte verwijderen?'))return;\n  if(modalMode==='pos')state.pos.splice(modalEditIdx,1);\n  else state.stop.splice(modalEditIdx,1);\n  save();closeModal();renderAll();showToast('Verwijderd');\n}\nfunction clearAll(){\n  localStorage.removeItem('mindset_stack_v3');\n  location.reload();\n}\n\nfunction switchMain(tab){\n  ['dag','maand','beloningen','instellingen'].forEach(t=>{\n    document.getElementById('panel-'+t).classList.toggle('active',t===tab);\n    document.getElementById('nav-'+t).classList.toggle('active',t===tab);\n  });\n  if(tab==='maand')renderMonth();\n  if(tab==='beloningen')renderRewards();\n  if(tab==='instellingen')renderSettings();\n}\n\nrenderAll();\n<\/script>\n<\/body>\n<\/html>\n",
-  "stderr" : ""
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0f">
+<title>Mindset Stack</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #13131a;
+  --surface2: #1c1c26;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0f0f0;
+  --text2: #888;
+  --text3: #555;
+  --green: #1D9E75;
+  --green-l: rgba(29,158,117,0.15);
+  --green-d: #0f6e56;
+  --red: #D85A30;
+  --red-l: rgba(216,90,48,0.15);
+  --amber: #EF9F27;
+  --amber-l: rgba(239,159,39,0.12);
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; overscroll-behavior: none; }
+body { display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; min-height: 100dvh; }
+
+/* Header */
+.app-header { padding: 56px 20px 16px; background: var(--bg); position: sticky; top: 0; z-index: 10; border-bottom: 1px solid var(--border); }
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.app-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+.app-title span { color: var(--green); }
+.day-nav { display: flex; align-items: center; gap: 8px; }
+.nav-btn { background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); font-size: 14px; transition: all 0.15s; }
+.nav-btn:active { transform: scale(0.92); background: var(--green-l); }
+.day-label { font-size: 13px; font-weight: 500; color: var(--text2); min-width: 90px; text-align: center; font-family: 'DM Mono', monospace; }
+
+/* Level bar */
+.level-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; }
+.level-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.level-name { font-size: 20px; font-weight: 700; }
+.level-xp { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; }
+.bar-track { height: 6px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--green); border-radius: 6px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+
+/* Stats */
+.stats-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 10px; text-align: center; }
+.stat-n { font-size: 24px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.stat-l { font-size: 10px; color: var(--text2); margin-top: 3px; letter-spacing: 0.04em; }
+
+/* Tabs */
+.tabs { display: flex; background: var(--surface); border-radius: var(--radius-sm); padding: 3px; margin-bottom: 16px; }
+.tab { flex: 1; text-align: center; padding: 8px 4px; font-size: 12px; font-weight: 500; border-radius: 6px; cursor: pointer; color: var(--text2); transition: all 0.15s; }
+.tab.active { background: var(--green); color: #fff; }
+
+/* Main scroll */
+.main-scroll { flex: 1; overflow-y: auto; padding: 16px 20px 32px; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Section label */
+.sec-lbl { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: var(--text3); margin-bottom: 10px; }
+
+/* Habit cards */
+.habits-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.hcard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; cursor: pointer; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.hcard:active { transform: scale(0.98); }
+.hcard.done { background: var(--green-l); border-color: var(--green); }
+.hcard.penalty { border-color: rgba(216,90,48,0.3); }
+.hcard.penalty-done { background: var(--red-l); border-color: var(--red); }
+.hcard-left { display: flex; align-items: center; gap: 12px; flex: 1; }
+.chk { width: 22px; height: 22px; border-radius: 6px; border: 1.5px solid var(--border2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+.hcard.done .chk { background: var(--green); border-color: var(--green); }
+.hcard.penalty-done .chk { background: var(--red); border-color: var(--red); }
+.hcard-info { flex: 1; }
+.hcard-name { font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.2; }
+.hcard-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+.hcard.done .hcard-sub { color: var(--green); }
+.hcard.penalty-done .hcard-sub { color: var(--red); }
+.badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; font-family: 'DM Mono', monospace; white-space: nowrap; }
+.badge-green { background: var(--green-l); color: var(--green); }
+.badge-green-done { background: var(--green); color: #fff; }
+.badge-red { background: var(--red-l); color: var(--red); }
+.badge-red-done { background: var(--red); color: #fff; }
+
+/* Month calendar */
+.cal-header { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 6px; }
+.cal-day-lbl { font-size: 10px; color: var(--text3); text-align: center; font-weight: 500; }
+.cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; margin-bottom: 16px; }
+.cal-day { border-radius: 8px; padding: 6px 2px; text-align: center; cursor: pointer; border: 1px solid transparent; transition: all 0.12s; }
+.cal-day:active { transform: scale(0.94); }
+.cal-day.today { border-color: var(--green); }
+.cal-day.selected { background: var(--green-l); border-color: var(--green); }
+.cal-day.has-xp { background: var(--surface2); }
+.cal-day.future { opacity: 0.3; cursor: default; }
+.cal-day.empty { cursor: default; }
+.cd-num { font-size: 13px; font-weight: 600; color: var(--text); }
+.cd-xp { font-size: 9px; color: var(--text3); margin-top: 1px; font-family: 'DM Mono', monospace; }
+.cd-xp.pos { color: var(--green); }
+
+.month-stats { display: grid; grid-template-columns: repeat(2,1fr); gap: 8px; margin-bottom: 20px; }
+.ms-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; }
+.ms-n { font-size: 22px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.ms-n.green { color: var(--green); }
+.ms-n.amber { color: var(--amber); }
+.ms-l { font-size: 10px; color: var(--text2); margin-top: 2px; }
+
+.habit-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.habit-row:last-child { border: none; }
+.hr-name { font-size: 12px; color: var(--text2); width: 130px; flex-shrink: 0; }
+.hr-bar-wrap { flex: 1; height: 5px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+.hr-bar { height: 100%; border-radius: 5px; transition: width 0.4s; }
+.hr-count { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); min-width: 36px; text-align: right; }
+
+/* Rewards */
+.reward-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; }
+.reward-card.unlocked { border-color: var(--green); background: var(--green-l); }
+.rc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.rc-level { font-size: 14px; font-weight: 700; }
+.rc-badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
+.rc-unlocked { background: var(--green); color: #fff; }
+.rc-locked { background: var(--surface2); color: var(--text2); }
+.rc-reward { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.rc-perk { font-size: 11px; color: var(--text2); }
+.reward-card.unlocked .rc-perk { color: var(--green-d); }
+
+/* Settings */
+.settings-section { margin-bottom: 24px; }
+.settings-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+.habit-edit-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.he-name { flex: 1; font-size: 13px; color: var(--text); }
+.he-pts { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text2); min-width: 50px; text-align: right; }
+.he-type { font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+.he-pos { background: var(--green-l); color: var(--green); }
+.he-stop { background: var(--red-l); color: var(--red); }
+.add-btn { width: 100%; background: var(--surface2); border: 1px dashed var(--border2); border-radius: var(--radius-sm); padding: 12px; text-align: center; cursor: pointer; font-size: 13px; color: var(--text2); font-family: 'Syne', sans-serif; }
+.add-btn:active { background: var(--green-l); color: var(--green); }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border-radius: 20px 20px 0 0; padding: 20px; width: 100%; max-width: 480px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(.4,0,.2,1); }
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+.field-lbl { font-size: 11px; color: var(--text2); margin-bottom: 5px; letter-spacing: 0.04em; }
+.field-inp { width: 100%; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; margin-bottom: 12px; outline: none; }
+.field-inp:focus { border-color: var(--green); }
+.field-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.type-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); cursor: pointer; font-size: 12px; font-family: 'Syne', sans-serif; font-weight: 500; transition: all 0.12s; }
+.type-btn.active-pos { background: var(--green-l); border-color: var(--green); color: var(--green); }
+.type-btn.active-stop { background: var(--red-l); border-color: var(--red); color: var(--red); }
+.modal-btns { display: flex; gap: 8px; margin-top: 4px; }
+.modal-btn { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; transition: all 0.12s; }
+.modal-btn:active { transform: scale(0.97); }
+.btn-cancel { background: var(--surface2); color: var(--text2); }
+.btn-save { background: var(--green); color: #fff; }
+.btn-delete { background: var(--red-l); color: var(--red); }
+
+/* Toast */
+.toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-10px); background: var(--surface2); border: 1px solid var(--border2); border-radius: 30px; padding: 8px 16px; font-size: 13px; font-weight: 500; color: var(--text); z-index: 200; opacity: 0; transition: all 0.25s; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Reset btn */
+.reset-tiny { background: transparent; border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 10px; color: var(--text3); cursor: pointer; font-family: 'Syne', sans-serif; }
+.reset-tiny:active { color: var(--red); border-color: var(--red); }
+
+/* Levels strip */
+.levels-strip { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 12px; }
+.lp { font-size: 10px; padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--text3); background: var(--surface); }
+.lp.active { background: var(--green); color: #fff; border-color: var(--green); font-weight: 700; }
+.lp.done { border-color: var(--green-d); color: var(--green-d); }
+
+/* Nav bottom */
+.bottom-nav { display: flex; background: var(--surface); border-top: 1px solid var(--border); padding: 8px 0 24px; position: sticky; bottom: 0; }
+.bn-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 4px; cursor: pointer; color: var(--text3); transition: color 0.12s; font-size: 10px; font-weight: 500; }
+.bn-item.active { color: var(--green); }
+.bn-icon { font-size: 20px; }
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-top">
+    <div>
+      <div class="app-title">Mindset <span>Stack</span></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:2px;font-family:'DM Mono',monospace;" id="dateDisplay">-</div>
+    </div>
+    <div class="day-nav">
+      <button class="nav-btn" onclick="changeDay(-1)">&#8592;</button>
+      <span class="day-label" id="dayLabel">-</span>
+      <button class="nav-btn" onclick="changeDay(1)">&#8594;</button>
+      <button class="reset-tiny" onclick="resetDay()">reset</button>
+    </div>
+  </div>
+  <div class="level-wrap">
+    <div class="level-row">
+      <span class="level-name" id="levelName">-</span>
+      <span class="level-xp" id="levelXp">-</span>
+    </div>
+    <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+    <div class="levels-strip" id="levelsStrip"></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-n" id="sCumXP">0</div><div class="stat-l">totaal XP</div></div>
+    <div class="stat-card"><div class="stat-n" id="sDayXP">0</div><div class="stat-l">vandaag</div></div>
+    <div class="stat-card"><div class="stat-n" id="sStreak">0</div><div class="stat-l">streak</div></div>
+  </div>
+</div>
+
+<div class="main-scroll">
+
+  <!-- DAG PANEL -->
+  <div class="panel active" id="panel-dag">
+    <div class="sec-lbl">POSITIEVE GEWOONTES</div>
+    <div class="habits-grid" id="posGrid"></div>
+    <div class="sec-lbl">PENALTY — tik als je hebt gefaald</div>
+    <div class="habits-grid" id="stopGrid"></div>
+  </div>
+
+  <!-- MAAND PANEL -->
+  <div class="panel" id="panel-maand">
+    <div class="sec-lbl" id="monthTitle">APRIL 2026</div>
+    <div class="cal-header">
+      <div class="cal-day-lbl">ma</div><div class="cal-day-lbl">di</div><div class="cal-day-lbl">wo</div>
+      <div class="cal-day-lbl">do</div><div class="cal-day-lbl">vr</div><div class="cal-day-lbl">za</div>
+      <div class="cal-day-lbl">zo</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="month-stats">
+      <div class="ms-card"><div class="ms-n green" id="msXP">0</div><div class="ms-l">totaal XP deze maand</div></div>
+      <div class="ms-card"><div class="ms-n amber" id="msStreak">0</div><div class="ms-l">langste streak</div></div>
+      <div class="ms-card"><div class="ms-n" id="msActive">0</div><div class="ms-l">actieve dagen</div></div>
+      <div class="ms-card"><div class="ms-n" id="msAvg">0</div><div class="ms-l">gem. XP per dag</div></div>
+    </div>
+    <div class="sec-lbl">SCORE PER GEWOONTE</div>
+    <div id="habitMonthList"></div>
+  </div>
+
+  <!-- BELONINGEN PANEL -->
+  <div class="panel" id="panel-beloningen">
+    <div id="rewardsList"></div>
+  </div>
+
+  <!-- INSTELLINGEN PANEL -->
+  <div class="panel" id="panel-instellingen">
+    <div class="settings-section">
+      <div class="settings-title">Positieve gewoontes</div>
+      <div id="posEditList"></div>
+      <div class="add-btn" onclick="openModal('pos')">+ Gewoonte toevoegen</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">Penalty gewoontes</div>
+      <div id="stopEditList"></div>
+      <div class="add-btn" onclick="openModal('stop')">+ Penalty toevoegen</div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">Beloningen aanpassen</div>
+      <div id="rewardEditList"></div>
+    </div>
+    <div style="margin-top:8px;">
+      <div class="add-btn" onclick="if(confirm('Alle data verwijderen?'))clearAll()" style="color:#D85A30;">Alle data verwijderen</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom nav -->
+<div class="bottom-nav">
+  <div class="bn-item active" id="nav-dag" onclick="switchMain('dag')">
+    <div class="bn-icon">&#9737;</div><div>Dag</div>
+  </div>
+  <div class="bn-item" id="nav-maand" onclick="switchMain('maand')">
+    <div class="bn-icon">&#128197;</div><div>Maand</div>
+  </div>
+  <div class="bn-item" id="nav-beloningen" onclick="switchMain('beloningen')">
+    <div class="bn-icon">&#9733;</div><div>Beloningen</div>
+  </div>
+  <div class="bn-item" id="nav-instellingen" onclick="switchMain('instellingen')">
+    <div class="bn-icon">&#9881;</div><div>Instellingen</div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Gewoonte toevoegen</div>
+    <div class="field-lbl">NAAM</div>
+    <input class="field-inp" id="modalName" placeholder="bijv. Cold shower" />
+    <div class="field-lbl">TYPE</div>
+    <div class="field-row">
+      <button class="type-btn active-pos" id="typePosBtn" onclick="setType('pos')">Positief</button>
+      <button class="type-btn" id="typeStopBtn" onclick="setType('stop')">Penalty</button>
+    </div>
+    <div class="field-lbl">XP WAARDE</div>
+    <input class="field-inp" id="modalXP" type="number" placeholder="bijv. 10" />
+    <div class="modal-btns">
+      <button class="modal-btn btn-cancel" onclick="closeModal()">Annuleer</button>
+      <button class="modal-btn btn-delete" id="deleteBtn" style="display:none" onclick="deleteHabit()">Verwijder</button>
+      <button class="modal-btn btn-save" onclick="saveHabit()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_POS=[
+  {id:'semen',name:'Semen retentie',pts:15},
+  {id:'dialoog',name:'Instant dialoog',pts:8},
+  {id:'muay',name:'Muay Thai',pts:20},
+  {id:'fysiek',name:'Fysieke activiteit',pts:12},
+  {id:'lezen',name:'Lezen / cursus',pts:10},
+  {id:'mediteer',name:'Mediteren',pts:10},
+  {id:'adem',name:'Ademhaling',pts:8},
+  {id:'money',name:'Money moves',pts:15},
+  {id:'ongemak',name:'Ongemakkelijke actie',pts:12},
+];
+const DEFAULT_STOP=[
+  {id:'frisdrank',name:'Geen frisdrank',pts:-20},
+  {id:'social',name:'Max 1u social media',pts:-25},
+  {id:'dating',name:'Geen dating app',pts:-25},
+];
+const DEFAULT_REWARDS=[
+  {level:'Beginner',xp:0,reward:'Tracker toegang',perk:'Start je systeem op'},
+  {level:'Consistent',xp:100,reward:'1 vrije ochtend',perk:'Kies zelf je training die dag'},
+  {level:'Gefocust',xp:250,reward:'Nieuwe sportuitrusting (50 euro)',perk:'Budget voor gear + 1 cheatmeal'},
+  {level:'Disciplined',xp:500,reward:'Solo dagtrip + 100 euro investering',perk:'Volledig vrije dag naar keuze'},
+  {level:'Elite',xp:900,reward:'Weekendtrip + 250 euro investering',perk:'Trip + eigen regel toevoegen'},
+  {level:'Sovereign',xp:1500,reward:'Reis naar keuze',perk:'Volledige vrijheid — jij bepaalt'},
+];
+const MONTHS_NL=['Januari','Februari','Maart','April','Mei','Juni','Juli','Augustus','September','Oktober','November','December'];
+const DAYS_NL=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+
+let state;
+try{state=JSON.parse(localStorage.getItem('mindset_stack_v3')||'null');}catch(e){}
+if(!state){
+  const today=new Date();
+  state={
+    currentDate:today.toISOString().slice(0,10),
+    pos:JSON.parse(JSON.stringify(DEFAULT_POS)),
+    stop:JSON.parse(JSON.stringify(DEFAULT_STOP)),
+    rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),
+    days:{},
+  };
+}
+
+function save(){try{localStorage.setItem('mindset_stack_v3',JSON.stringify(state));}catch(e){}}
+
+function parseDate(s){const p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+function formatDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function getDayState(dateStr){if(!state.days[dateStr])state.days[dateStr]={pos:{},stop:{}};return state.days[dateStr];}
+
+function getDayXP(dateStr){
+  const ds=getDayState(dateStr);
+  let xp=0;
+  state.pos.forEach(h=>{if(ds.pos[h.id])xp+=h.pts;});
+  state.stop.forEach(h=>{if(ds.stop[h.id])xp+=h.pts;});
+  return Math.max(0,xp);
+}
+
+function getCumXP(upToDate){
+  let total=0;
+  Object.keys(state.days).forEach(dt=>{
+    if(dt<=upToDate)total+=getDayXP(dt);
+  });
+  return total;
+}
+
+function getTotalXP(){
+  return getCumXP(formatDate(new Date()));
+}
+
+function getStreak(upToDate){
+  const d=parseDate(upToDate);
+  let streak=0;
+  for(let i=0;i<60;i++){
+    const check=new Date(d);check.setDate(d.getDate()-i);
+    if(getDayXP(formatDate(check))>0)streak++;
+    else break;
+  }
+  return streak;
+}
+
+function getMaxStreak(year,month){
+  const days=new Date(year,month+1,0).getDate();
+  let max=0,cur=0;
+  for(let d=1;d<=days;d++){
+    const dt=formatDate(new Date(year,month,d));
+    if(getDayXP(dt)>0){cur++;if(cur>max)max=cur;}else cur=0;
+  }
+  return max;
+}
+
+function getLevelIdx(xp){
+  const levels=DEFAULT_REWARDS;
+  for(let i=levels.length-1;i>=0;i--){if(xp>=levels[i].xp)return i;}
+  return 0;
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+function changeDay(delta){
+  const d=parseDate(state.currentDate);
+  d.setDate(d.getDate()+delta);
+  state.currentDate=formatDate(d);
+  save();renderAll();
+}
+
+function resetDay(){
+  if(!confirm('Reset gewoontes voor deze dag?'))return;
+  state.days[state.currentDate]={pos:{},stop:{}};
+  save();renderAll();showToast('Dag gereset');
+}
+
+function togglePos(id){
+  const ds=getDayState(state.currentDate);
+  const h=state.pos.find(x=>x.id===id);
+  if(ds.pos[id]){delete ds.pos[id];showToast('-'+h.pts+' XP');}
+  else{ds.pos[id]=true;showToast('+'+h.pts+' XP verdiend!');}
+  save();renderAll();
+}
+
+function toggleStop(id){
+  const ds=getDayState(state.currentDate);
+  const h=state.stop.find(x=>x.id===id);
+  if(ds.stop[id]){delete ds.stop[id];showToast('Penalty verwijderd');}
+  else{ds.stop[id]=true;showToast(h.pts+' XP penalty!');}
+  save();renderAll();
+}
+
+function renderAll(){
+  const cd=state.currentDate;
+  const d=parseDate(cd);
+  const ds=getDayState(cd);
+  const dayXP=getDayXP(cd);
+  const totalXP=getTotalXP();
+  const streak=getStreak(cd);
+  const today=formatDate(new Date());
+  const isToday=cd===today;
+
+  document.getElementById('dayLabel').textContent=(isToday?'vandaag ':'')+d.getDate()+' '+MONTHS_NL[d.getMonth()].slice(0,3).toLowerCase();
+  document.getElementById('dateDisplay').textContent=DAYS_NL[d.getDay()===0?6:d.getDay()-1]+' '+d.getDate()+' '+MONTHS_NL[d.getMonth()]+' '+d.getFullYear();
+
+  const lvlIdx=getLevelIdx(totalXP);
+  const lvl=DEFAULT_REWARDS[lvlIdx];
+  const nextLvl=DEFAULT_REWARDS[Math.min(lvlIdx+1,DEFAULT_REWARDS.length-1)];
+  const pct=lvlIdx<DEFAULT_REWARDS.length-1?Math.min(100,Math.round((totalXP-lvl.xp)/(nextLvl.xp-lvl.xp)*100)):100;
+  document.getElementById('levelName').textContent=lvl.level;
+  document.getElementById('levelXp').textContent=totalXP+' / '+nextLvl.xp+' XP';
+  document.getElementById('barFill').style.width=pct+'%';
+  document.getElementById('sCumXP').textContent=totalXP;
+  document.getElementById('sDayXP').textContent=dayXP;
+  document.getElementById('sStreak').textContent=streak;
+
+  document.getElementById('levelsStrip').innerHTML=DEFAULT_REWARDS.map((r,i)=>{
+    let cls='lp';
+    if(i===lvlIdx)cls+=' active';
+    else if(i<lvlIdx)cls+=' done';
+    return '<span class="'+cls+'">'+r.level+'</span>';
+  }).join('');
+
+  document.getElementById('posGrid').innerHTML=state.pos.map(h=>{
+    const done=!!ds.pos[h.id];
+    return '<div class="hcard'+(done?' done':'')+'" onclick="togglePos(\''+h.id+'\')">'+
+      '<div class="hcard-left"><div class="chk">'+(done?chkSVG('#fff'):'')+
+      '</div><div class="hcard-info"><div class="hcard-name">'+h.name+'</div>'+
+      '<div class="hcard-sub">'+(done?'Voltooid vandaag':'Tik als klaar')+'</div></div></div>'+
+      '<span class="badge '+(done?'badge-green-done':'badge-green')+'">'+(done?'klaar':'+'+h.pts+' XP')+'</span></div>';
+  }).join('');
+
+  document.getElementById('stopGrid').innerHTML=state.stop.map(h=>{
+    const failed=!!ds.stop[h.id];
+    return '<div class="hcard'+(failed?' penalty-done':' penalty')+'" onclick="toggleStop(\''+h.id+'\')">'+
+      '<div class="hcard-left"><div class="chk">'+(failed?xSVG('#fff'):'')+
+      '</div><div class="hcard-info"><div class="hcard-name">'+h.name+'</div>'+
+      '<div class="hcard-sub">'+(failed?'Gefaald vandaag':'Tik als je faalt')+'</div></div></div>'+
+      '<span class="badge '+(failed?'badge-red-done':'badge-red')+'">'+(failed?'gefaald':h.pts+' XP')+'</span></div>';
+  }).join('');
+
+  if(document.getElementById('panel-maand').classList.contains('active'))renderMonth();
+  if(document.getElementById('panel-beloningen').classList.contains('active'))renderRewards();
+  if(document.getElementById('panel-instellingen').classList.contains('active'))renderSettings();
+}
+
+function chkSVG(c){return '<svg width="12" height="12" viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3" stroke="'+c+'" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';}
+function xSVG(c){return '<svg width="12" height="12" viewBox="0 0 12 12"><line x1="2" y1="2" x2="10" y2="10" stroke="'+c+'" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="2" x2="2" y2="10" stroke="'+c+'" stroke-width="2" stroke-linecap="round"/></svg>';}
+
+function renderMonth(){
+  const d=parseDate(state.currentDate);
+  const year=d.getFullYear(),month=d.getMonth();
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const today=formatDate(new Date());
+  const firstDow=new Date(year,month,1).getDay();
+  const startOffset=firstDow===0?6:firstDow-1;
+
+  document.getElementById('monthTitle').textContent=MONTHS_NL[month].toUpperCase()+' '+year;
+
+  let grid='';
+  for(let e=0;e<startOffset;e++)grid+='<div class="cal-day empty"></div>';
+  for(let day=1;day<=daysInMonth;day++){
+    const dt=formatDate(new Date(year,month,day));
+    const xp=getDayXP(dt);
+    const isFuture=dt>today;
+    const isToday=dt===today;
+    const isSelected=dt===state.currentDate;
+    let cls='cal-day';
+    if(isFuture)cls+=' future';
+    else if(xp>0)cls+=' has-xp';
+    if(isToday)cls+=' today';
+    if(isSelected)cls+=' selected';
+    grid+='<div class="'+cls+'" onclick="'+(isFuture?'':('goToDay(\''+dt+'\')'))+'">'
+      +'<div class="cd-num">'+day+'</div>'
+      +'<div class="cd-xp'+(xp>0?' pos':'')+'">'+xp+'</div></div>';
+  }
+  document.getElementById('calGrid').innerHTML=grid;
+
+  let totalXP=0,activeDays=0;
+  for(let day=1;day<=daysInMonth;day++){
+    const dt=formatDate(new Date(year,month,day));
+    if(dt<=today){const x=getDayXP(dt);totalXP+=x;if(x>0)activeDays++;}
+  }
+  const maxStreak=getMaxStreak(year,month);
+  const avg=activeDays>0?Math.round(totalXP/activeDays):0;
+  document.getElementById('msXP').textContent=totalXP;
+  document.getElementById('msStreak').textContent=maxStreak;
+  document.getElementById('msActive').textContent=activeDays;
+  document.getElementById('msAvg').textContent=avg;
+
+  const allH=[...state.pos.map(h=>({...h,isStop:false})),...state.stop.map(h=>({...h,isStop:true}))];
+  const daysTracked=parseInt(today.split('-')[2]);
+  document.getElementById('habitMonthList').innerHTML=allH.map(h=>{
+    let count=0;
+    for(let day=1;day<=Math.min(daysTracked,daysInMonth);day++){
+      const dt=formatDate(new Date(year,month,day));
+      const ds=getDayState(dt);
+      if(h.isStop?ds.stop[h.id]:ds.pos[h.id])count++;
+    }
+    const pct=Math.min(100,Math.round(count/Math.min(daysTracked,daysInMonth)*100));
+    return '<div class="habit-row">'+
+      '<span class="hr-name">'+h.name+'</span>'+
+      '<div class="hr-bar-wrap"><div class="hr-bar" style="width:'+pct+'%;background:'+(h.isStop?'#D85A30':'#1D9E75')+'"></div></div>'+
+      '<span class="hr-count">'+count+'x</span></div>';
+  }).join('');
+}
+
+function goToDay(dt){
+  state.currentDate=dt;save();
+  switchMain('dag');renderAll();
+}
+
+function renderRewards(){
+  const d=parseDate(state.currentDate);
+  const cumXP=getCumXP(state.currentDate);
+  const lvlIdx=getLevelIdx(cumXP);
+  document.getElementById('rewardsList').innerHTML=state.rewards.map((r,i)=>{
+    const unlocked=cumXP>=r.xp;
+    return '<div class="reward-card'+(unlocked?' unlocked':'')+'">'+
+      '<div class="rc-top"><span class="rc-level">'+r.level+' ('+r.xp+'+ XP)</span>'+
+      '<span class="rc-badge '+(unlocked?'rc-unlocked':'rc-locked')+'">'+(unlocked?'Ontgrendeld':'Vergrendeld')+'</span></div>'+
+      '<div class="rc-reward">'+r.reward+'</div>'+
+      '<div class="rc-perk">'+r.perk+'</div></div>';
+  }).join('');
+}
+
+function renderSettings(){
+  document.getElementById('posEditList').innerHTML=state.pos.map((h,i)=>
+    '<div class="habit-edit-card">'+
+    '<span class="he-type he-pos">+'+h.pts+'XP</span>'+
+    '<span class="he-name">'+h.name+'</span>'+
+    '<button class="reset-tiny" onclick="openEditModal(\'pos\','+i+')">bewerk</button></div>'
+  ).join('');
+  document.getElementById('stopEditList').innerHTML=state.stop.map((h,i)=>
+    '<div class="habit-edit-card">'+
+    '<span class="he-type he-stop">'+h.pts+'XP</span>'+
+    '<span class="he-name">'+h.name+'</span>'+
+    '<button class="reset-tiny" onclick="openEditModal(\'stop\','+i+')">bewerk</button></div>'
+  ).join('');
+  document.getElementById('rewardEditList').innerHTML=state.rewards.map((r,i)=>
+    '<div class="habit-edit-card">'+
+    '<span class="he-type he-pos">'+r.xp+'XP</span>'+
+    '<span class="he-name">'+r.level+' — '+r.reward+'</span></div>'
+  ).join('');
+}
+
+let modalMode='pos',modalEditIdx=-1,modalOriginalMode='pos',modalOriginalIdx=-1;
+function openModal(type){
+  modalMode=type;modalEditIdx=-1;modalOriginalMode=type;modalOriginalIdx=-1;
+  document.getElementById('modalTitle').textContent='Gewoonte toevoegen';
+  document.getElementById('modalName').value='';
+  document.getElementById('modalXP').value='';
+  document.getElementById('deleteBtn').style.display='none';
+  setType(type);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function openEditModal(type,idx){
+  modalMode=type;modalEditIdx=idx;modalOriginalMode=type;modalOriginalIdx=idx;
+  const h=type==='pos'?state.pos[idx]:state.stop[idx];
+  document.getElementById('modalTitle').textContent='Gewoonte bewerken';
+  document.getElementById('modalName').value=h.name;
+  document.getElementById('modalXP').value=Math.abs(h.pts);
+  document.getElementById('deleteBtn').style.display='block';
+  setType(type);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function setType(t){
+  modalMode=t;
+  document.getElementById('typePosBtn').className='type-btn'+(t==='pos'?' active-pos':'');
+  document.getElementById('typeStopBtn').className='type-btn'+(t==='stop'?' active-stop':'');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+
+function migrateHabitDayMarks(id,fromType,toType){
+  Object.values(state.days).forEach(ds=>{
+    if(!ds.pos)ds.pos={};
+    if(!ds.stop)ds.stop={};
+    if(ds[fromType][id]){
+      ds[toType][id]=ds[fromType][id];
+      delete ds[fromType][id];
+    }
+  });
+}
+
+function removeHabitDayMarks(id,type){
+  Object.values(state.days).forEach(ds=>{
+    if(ds[type])delete ds[type][id];
+  });
+}
+
+function saveHabit(){
+  const name=document.getElementById('modalName').value.trim();
+  const xpRaw=parseInt(document.getElementById('modalXP').value)||10;
+  const pts=modalMode==='stop'?-Math.abs(xpRaw):Math.abs(xpRaw);
+  if(!name){showToast('Vul een naam in');return;}
+  if(modalEditIdx>=0){
+    const sourceList=modalOriginalMode==='pos'?state.pos:state.stop;
+    const targetList=modalMode==='pos'?state.pos:state.stop;
+    const existing=sourceList[modalOriginalIdx];
+    if(!existing){showToast('Gewoonte niet gevonden');return;}
+    const updated={...existing,name,pts};
+    if(modalMode===modalOriginalMode){
+      sourceList[modalOriginalIdx]=updated;
+    }else{
+      sourceList.splice(modalOriginalIdx,1);
+      targetList.push(updated);
+      migrateHabitDayMarks(updated.id,modalOriginalMode,modalMode);
+    }
+  } else {
+    const id='h_'+Date.now();
+    if(modalMode==='pos')state.pos.push({id,name,pts});
+    else state.stop.push({id,name,pts});
+  }
+  save();closeModal();renderAll();showToast('Opgeslagen!');
+}
+function deleteHabit(){
+  if(!confirm('Gewoonte verwijderen?'))return;
+  const sourceList=modalOriginalMode==='pos'?state.pos:state.stop;
+  const existing=sourceList[modalOriginalIdx];
+  if(existing)removeHabitDayMarks(existing.id,modalOriginalMode);
+  sourceList.splice(modalOriginalIdx,1);
+  save();closeModal();renderAll();showToast('Verwijderd');
+}
+function clearAll(){
+  localStorage.removeItem('mindset_stack_v3');
+  location.reload();
+}
+
+function switchMain(tab){
+  ['dag','maand','beloningen','instellingen'].forEach(t=>{
+    document.getElementById('panel-'+t).classList.toggle('active',t===tab);
+    document.getElementById('nav-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='maand')renderMonth();
+  if(tab==='beloningen')renderRewards();
+  if(tab==='instellingen')renderSettings();
+}
+
+renderAll();
+</script>
+</body>
+</html>
